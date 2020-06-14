@@ -34,6 +34,8 @@
 \usepackage[thmmarks,amsmath]{ntheorem}
 % Definiert eine theorem-Umgebung mit Überschrift ‘‘Satz’’
 \newtheorem{theorem}{Beispiel}[section]
+\theoremstyle{nonumberplain}
+\newtheorem{definition}{Definition}
 
 
 %Seminar definieren

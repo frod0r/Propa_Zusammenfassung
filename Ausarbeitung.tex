@@ -5,6 +5,10 @@
 \usepackage{placeins}
 \usepackage{csquotes}
 \usepackage{url}
+\usepackage{multicol}
+\usepackage{ulem}
+\usepackage{textgreek}
+\usepackage{booktabs}
 \definecolor{lightgray}{rgb}{.9,.9,.9}
 \definecolor{darkgray}{rgb}{.4,.4,.4}
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
@@ -30,11 +34,202 @@
 %
 
 \section{Haskell}\label{sec:haskell}
-Linear Rekursiv: In jeden Definitionszweig kommt nur ein rekursiver Aufruf vor\\
-Endrekursiv: Linear rekursiv in jeden Zweig ist  der rekursive Aufruf nicht in andere Aufrufe eingebettet
-Listen
-
-\section{Smart Contracts}\label{sec:smart-contracts}
+%\newmintinline['macro name']{'language'}{'options'}
+\newmintinline{haskell}{}
+\textbf{Linear Rekursiv}: In jeden Definitionszweig kommt nur ein rekursiver Aufruf vor.\\
+\textbf{Endrekursiv}: Linear rekursiv in jeden Zweig ist  der rekursive Aufruf nicht in andere Aufrufe eingebettet.\\
+\subsection{Listen}\label{subsec:listen}
+\haskellinline{[]}, \haskellinline{x:xs}, \haskellinline{head[1,2,3] => 1},
+\haskellinline{tail[1,2,3] => [2,3]}, \haskellinline{init xs -- Alle elemente bis auf das letzte},
+\haskellinline{null[1,2,3] => False},
+\haskellinline{length},\haskellinline{isIn}, \haskellinline{a ++ b},
+\haskellinline{take n l -- erste n Elemente von l},
+\haskellinline{drop n l  -- l ohne erste n Elemente},
+\haskellinline{xs !! n -- Nte Listenelement},
+%TODO: In einzellne Zellen ziehen?
+\begin{minted}{haskell}
+reverse xs
+map f (x:xs) -- wendet f auf alle Listenelemente an
+filter pred (x:xs) -- behalte alle Elemente, die Prädikat erfüllen
+\end{minted}
+\subsection{Funktionsanwendungen}\label{subsec:funktionsanwendungen}
+Funktionskomposition $f \circ g$: \haskellinline{comp f g = (\x -> f (g x))} Infix: \haskellinline{f.g}\\
+n-Fache Funktionsanwendung $f^n$: \haskellinline{iter f n}\\
+\textcolor{darkgray}{Funktionstypen sind rechts-assoziativ, Funktionsanwendung ist links-assoziativ}\\
+\haskellinline{f x = y + x} Variable $x$ Gebunden, Variable $y$ frei.\\
+\subsection{Lokale Namensbindung}\label{subsec:lokale-namensbindung}
+\begin{multicols}{2}
+    \begin{minted}{haskell}
+energy m = let c = 299
+        square = x = x * x
+    in m * (square c)
+    \end{minted}
+\columnbreak
+    \begin{minted}{haskell}
+energy m = m * (square c)
+    where c = 299
+        square x = x * x
+    \end{minted}
+\end{multicols}
+\textcolor{darkgray}{Einrückung hat semantische Bedeutung}.\\
+\textcolor{darkgray}{Bei Schachtelung: Inneres \haskellinline{let} bindet stärker.}\\
+\subsection{Folds}\label{subsec:folds}
+%! suppress = Ellipsis
+\begin{minted}[escapeinside=||]{haskell}
+foldr operator initial [] = initial
+foldr operator initial (x:xs) = operator x (foldr operator initial xs)
+|\textcolor{darkgray}{\texttt{foldr f z [x1, x2, \ldots, xn] == x1 `f` (x2 `f`\ldots(xn `f` z)\ldots)}}|
+foldl op i [] i
+foldl op i (x:xs) = foldl op (op i x) xs
+|\textcolor{darkgray}{\texttt{foldl f z [x1, x2, \ldots, xn] == (\ldots((z `f` x1) `f` x2) `f`\ldots)`f` xn}}|
+\end{minted}
+\textcolor{darkgray}{Beispiel: \texttt{length \sout{list} = foldr (\textbackslash x n -> n + 1) 0 \sout{list}}}
+\begin{multicols}{2}
+\begin{minted}{haskell}
+concat [xs, ys, zs] = xs ++ ys ++ zs
+\end{minted}
+\columnbreak
+\textcolor{darkgray}{\texttt{concat == foldr app []}}
+\end{multicols}
+\begin{minted}{haskell}
+zipWith f (x:xs) (y:ys) = f x y : zipWith f xs ys
+zipWith f xs ys = []
+zip = zipWith (,) -- zip[1,2,3],[7,8,9] = [(1,7),(2,8),(3,9)]
+\end{minted}
+Kurznotation Intervalle \haskellinline{[a..b]} $=>^+$ \haskellinline{[a, a+1, a+2, ..., b]}\\
+List Comprehensions \haskellinline{[e | q1, ..., qm]}, $q_i$ Tests oder Generatoren der Form $p \leftarrow list$ mit Muster $p$ und Listenausdruck $list$\\
+\textcolor{darkgray}{Beispiel: \texttt{squares n = [x * x | x <- [0..n]]}}\\
+Im Muster \texttt{p} gebundene Variablen können in \texttt{e} und in \texttt{qi} verwendet werden\\
+%! suppress = RedundantEscape
+\textcolor{darkgray}{Beispiel: \texttt{evens n = [x | $\underbrace{\texttt{x<-[0..n]}}_\text{Generator}$, $\underbrace{\texttt{x \textasciigrave mod \textasciigrave 2 == 0]}}_\text{Tester}$}}
+\textbf{Unendliche Listen}: \haskellinline{odds = 1 : map (+2) odds}
+%! suppress = LineBreak
+\begin{minted}[escapeinside=||]{haskell}
+iterate f a = a : iterate f (f a)
+|\textcolor{darkgray}{odds = iterate (+2)  1}|
+iterate f x !! 23 -- führt "Schleife" 23 mal aus
+\end{minted}
+\subsection{Typen}\label{subsec:typen}
+\begin{minted}[escapeinside=||]{haskell}
+type neuerName = [Integer]
+               = String
+               = (a, b)
+               = |\dots|
+\end{minted}
+\begin{multicols}{2}
+Algebraische Datentypen
+\begin{minted}{haskell}
+data Shape = Circle Double
+        | Rectangle Double Double
+\end{minted}
+\columnbreak
+Konstruktoren
+\begin{minted}{haskell}
+Circle :: Double -> Shape
+Rectangle :: Double -> Double -> Shape
+\end{minted}
+\end{multicols}
+Aufzählungstypen
+\begin{minted}{haskell}
+data Season = Spring | Summer | Autumn | Winter
+\end{minted}
+Polymorphe Datentypen (Optionale Werte)
+\begin{minted}{haskell}
+data Maybe t = Nothing | Just t
+data Either s t = Left s | Right t
+data Matrix t = Dense [[t]] -- Liste von Zeilen
+        | Sparse [(Integer, Integer t)] t -- Einträge (i,j,v) und Defaultwert
+data Stack t = Empty | Stacked t (Stack t)
+\end{minted}
+Polymorphe Funktion mit Typeinschränkung
+\begin{multicols}{2}
+\begin{minted}[escapeinside=||]{haskell}
+qsort :: Ord t => [t] -> [t]
+qsort [] = []
+qsort (p:ps) = |\dots|
+\end{minted}
+\columnbreak
+Instanzen von Ord implementieren \haskellinline{<=, <, >, >=, ...}
+\end{multicols}
+\begin{multicols}{2}
+Typklassen-Definitionen
+\begin{minted}[escapeinside=\{\}]{haskell}
+instance Eq Bool where
+    True == True = True
+    True == False = False
+          {\vdots}
+    \end{minted}
+    \columnbreak
+    Fehlende Implementierungen: Default implementiert
+\end{multicols}
+\begin{minted}{haskell}
+data shape = Circle Double
+        | Rectangle Double Double
+        deriving Eq -- Keine eigene (==) Funktion mehr notwendig
+\end{minted}
+Automatische Instanziierung auch für \haskellinline{Show},\haskellinline{Ord},\haskellinline{Enum}
+\subsection{Monaden}\label{subsec:monaden}
+%TODO?
+\section{untypisiertes λ-Kalkül}\label{sec:untypisierteslambda--kalkul}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llll}
+        \toprule
+        \textbf{} & \textbf{Notation} & \textbf{Beispiele}\\
+        \midrule
+        Variablen & $x$ & $x$ & $y$ \\
+        Abstraktion & $\lambda x.t$ & $\lambda y.0$ & $\lambda f.\lambda x. \lambda y.f\ y\ x$ \\
+        Funktionsanwendung & $t_1 t_2$ & $f 42$ & $\lambda x.x + 5)\ 7$ \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:table}
+\end{table}
+Funktionsanwendung linksassoziativ, bindet stärker als Abstraktion
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lX}
+        \textalpha-Äquivalenz & $t_1$ und $t_t$ heißen \textalpha-äquivalent $t_1\stackrel{\alpha}{=}t_2$, wenn $t_1$ in $t_2$ durch konsistente Umbenennung der \textlambda-gebundenen Variablen überführt werden kann\\
+        \texteta-Äquivalenz & Terme $\lambda x.f\ x$ und $f$ heißen \texteta-äquivalent ($\lambda x.f\ x\stackrel{\eta}{=}f$) falls $x$ nicht freie Variable vob $f$\\
+        Redex & Ein \textlambda-Term der Form $(\lambda x.t_1)\ t_2$ heißt Redex\\
+        \textbeta-Reduktion & \textbeta-Reduktion entspricht der Ausführung der Funktionsanwendung auf einen Redex \[(\lambda x.t_1)t_2 \Rightarrow t_1 [x\mapsto t_2]\]\\
+        Substitution & $t_1[x\mapsto t_2]$ erhält man aus den Term $t_1$, wenn man alle freien Vorkommen von $x$ durch $t_2$ ersetzt\\
+        Normalform & Ein Term, der nicht weiter reduziert werden kann\\
+        Volle \textbeta-Reduktion & Jeder Redex kann jederzeit reduziert werden\\
+        Normalreihenfolge & Immer der linkeste äußerste Redex wird Reduziert\\
+    \end{tabularx}
+    \label{tab:2}
+\end{table}
+$let\ x = t_1\ in\ t_2$ wird zu $(\lambda x.t_2)\ t_1$
+\subsection{Church-Zahlen}\label{subsec:church-zahlen}
+Eine (natürliche) Zahl drückt aus, wie oft die funktion $s$ angewendet wurde\\
+    \begin{multicols}{2}
+        \begin{equation*}
+            \begin{aligned}
+                c_0 &= \lambda s.\lambda z.z\\
+                c_1 &= \lambda s.\lambda z.s\ z\\
+                c_2 &= \lambda s. \lambda z.s\ (s\ z)\\
+                &\vdots\\
+                c_n &= \lambda s. \lambda z\ s^n\ z
+        \end{aligned}\label{eq:equation}
+        \end{equation*}
+        \columnbreak\\
+        Nachfolgefunktion \[succ = \lambda n.\lambda s.\lambda z.s\ (n\ s\ z)\]
+        wobei $n$ Church Zahl
+    \end{multicols}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lX}
+        Addition & $plus = \lambda m.\lambda n.\lambda z.m\ s\ (n\ s\ z)$\\
+        Multiplikation & $\begin{aligned} times &= \lambda m.\lambda n.\lambda s.n(m\ s)\\&\stackrel{\eta}{=} \lambda m.\lambda n.\lambda s.\lambda z.n(m\ s)\ z\end{aligned}$\\
+        Potenzieren & $\begin{aligned} exp &= \lambda m.\lambda n.n\ m\\&\stackrel{\eta}{=}\lambda m.\lambda n.\lambda s.\lambda z.n\ m\ s\ z\end{aligned}$\\
+    \end{tabularx}\label{tab:table2}
+    \begin{tabularx}{\textwidth}{ll}
+        $c_{true}= \lambda t.\lambda f.t$ & $c_{false} = \lambda t.\lambda f.f$\\
+    \end{tabularx}
+    \begin{tabularx}{\textwidth}{l}
+    $isZero = \lambda n.n\ (\lambda x.c_{false})\ c_{true}$
+    \end{tabularx}
+\end{table}
 %
 % BibTeX Literaturverzeichnis
 %
