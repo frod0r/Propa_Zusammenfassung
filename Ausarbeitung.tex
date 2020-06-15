@@ -1,3 +1,4 @@
+%! suppress = MathOperatorEscape
 \documentclass{Zusammenfassung}
 
 %\usepackage{listings}
@@ -12,7 +13,31 @@
 \definecolor{lightgray}{rgb}{.9,.9,.9}
 \definecolor{darkgray}{rgb}{.4,.4,.4}
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc, arrows, fit, decorations.pathreplacing, shapes, shapes.multipart, snakes}
+%Folgende Definitionen sind aus dem TUT Copy-Pasted
+\newcommand{\typeRule}[3]{ \textrm{\textsc{#1}}\frac{#2}{#3}}
+\newcommand{\aeq}{\stackrel{\alpha}{=}}
+\newcommand{\naeq}{\stackrel{\alpha}{\neq}}
+\newcommand{\eeq}{\stackrel{\eta}{=}}
 
+\newcommand{\E}{\;}
+
+\newcommand{\liin}[2]{#1\E{}#2}
+\newcommand{\liiin}[3]{#1\E{}#2\E{}#3}
+\newcommand{\livn}[4]{#1\E{}#2\E{}#3\E{}#4}
+\newcommand{\lvn}[5]{#1\E{}#2\E{}#3\E{}#4\E{}#5}
+
+\newcommand{\lii}[2]{(#1\E{}#2)}
+\newcommand{\liii}[3]{(#1\E{}#2\E{}#3)}
+
+\newcommand{\liir}[2]{\textcolor{red}{\underline{(}}#1\E{}#2\textcolor{red}{\underline{)}}}
+\newcommand{\liiir}[3]{\textcolor{red}{\underline{(}}#1\E{}#2\E{}#3\textcolor{red}{\underline{)}}}
+
+\newcommand{\subst}[3]{(#1)\left[#2\,\to\,#3\right]}
+
+\newcommand{\abs}[2]{\lambda{}#1.#2}
+%% Ende der dreist kopierten Kommandos
 
 %Seminar definieren
 \Seminartitel{Programmierparadigmen}
@@ -170,7 +195,8 @@ data shape = Circle Double
 Automatische Instanziierung auch für \haskellinline{Show},\haskellinline{Ord},\haskellinline{Enum}
 \subsection{Monaden}\label{subsec:monaden}
 %TODO?
-\section{untypisiertes λ-Kalkül}\label{sec:untypisierteslambda--kalkul}
+\section{λ-Kalkül}\label{sec:lambda-kalkul}
+\subsection{untypisiertes λ-Kalkül}\label{subsec:untypisiertes-lambda-kalkul}
 \begin{table}[H]
     \centering
     \begin{tabular}{llll}
@@ -230,6 +256,68 @@ Eine (natürliche) Zahl drückt aus, wie oft die funktion $s$ angewendet wurde\\
     $isZero = \lambda n.n\ (\lambda x.c_{false})\ c_{true}$
     \end{tabularx}
 \end{table}
+    Rekursionsoperator
+    $y =\lambda f.(\lambda x.f\ (x\ x))(\lambda x.f\ (x\ x))$\\
+    $f\ (y\ f)\stackrel{\eta}{=}y\ f$\\
+    $y\ f$ ist Fixpunkt von $f$\\
+
+    Church-Rosser: Wenn $t \Rightarrow t_1$ und $t_1 \stackrel{*}{\Rightarrow} t_2$, dann gibt es $t'$ mit $t_1 \stackrel{*}{\Rightarrow}t'$ und $t_2 \stackrel{*}{\Rightarrow}t'$
+    \begin{table}[H]
+        \centering
+        \begin{tabularx}{\textwidth}{lX}
+            Call-by-name & Reduziere linkesten äußersten Redex aber nicht, falls von einem \textlambda\ umgeben \textrightarrow\ Reduziere Argumente erst, wenn benötigt\\
+            Call-by-Value & Reduziere linkesten Redex, der nicht von einem \textlambda\ umgeben und dessen Argument ein Wert \textrightarrow\ Argument vor Funktionsaufruf ist auszuwerten\\
+        \end{tabularx}\label{tab:table3}
+    \end{table}
+\subsection{Regelsysteme}\label{subsec:regelsysteme}
+Fregescher Schlussstrich
+\begin{equation*}
+    \typeRule{}{
+    \varphi_1\quad\varphi_2\quad\varphi_3\quad...\quad\varphi_n
+    }{
+    \varphi
+    }
+\end{equation*}
+Jede Regel stellt Implikation dar, $\varphi_i$ Voraussetzungen, $\varphi$ Konklusion\\
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lXX}
+        & \centerline{\textbf{Introduktionsregel}} &\centerline{\textbf{Eliminationsregel}}\\
+        Konjunktion &\begin{equation*}\typeRule{$\wedge{}I$}{\psi\ \varphi}{\psi\wedge \varphi}\end{equation*}&\begin{equation*}\typeRule{$\wedge{}E_1$}{\psi\wedge \varphi}{\psi}\quad\typeRule{$\wedge{}E_2$}{\psi\wedge \varphi}{\varphi}\end{equation*}\\
+        All-Quantor &\begin{equation*}\typeRule{$\forall{}I$}{P(y)\ y\ ist\ frei\ in\ P}{\forall{}x.P(x)}\end{equation*}&\begin{equation*}\typeRule{$\forall{}E$}{\forall{}x.P(x)}{P(y)}\end{equation*}\\
+        Implikation&\begin{equation*}\typeRule{$\rightarrow{}I$}{\begin{aligned}&\psi&\\&\vdots\footnotemark{}&\\&\varphi&\end{aligned}}{\psi\longrightarrow\varphi}\end{equation*}&\begin{equation*}\typeRule{MP}{\psi\longrightarrow\varphi\quad\psi}{\varphi}\end{equation*}\\
+    \end{tabularx}\label{tab:table4}
+\end{table}
+\footnotetext{Herleitung gemäß Regeln verbindet Implikation der Regeln mit prädikatenlogischer Implikation}
+
+Alternative Notation
+\begin{equation*}
+    \typeRule{}{
+    \Gamma_1 \vdash \varphi_1\quad\dots\quad\Gamma_n\vdash\varphi_n
+    }{
+    \vdash \varphi
+    }
+\end{equation*}
+Regelsysteme alternative Notation
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{XX}
+        \centerline{\textbf{Introduktionsregeln}} &\centerline{\textbf{Eliminationsregeln}}\\
+        \begin{equation*}\typeRule{$\wedge{}I$}{\Gamma\vdash\varphi\quad\Gamma\vdash\psi}{\Gamma\vdash\varphi\wedge\psi}\end{equation*}&\begin{equation*}\typeRule{$\wedge{}E_1$}{\Gamma\vdash\psi\wedge\psi}{\Gamma\vdash\varphi}\quad\typeRule{$\wedge{}E_2$}{\Gamma\vdash\varphi\wedge\psi}{\Gamma\vdash\psi}\end{equation*}\\
+        \begin{equation*}\typeRule{$\rightarrow{}I$}{\Gamma,\varphi\vdash\psi}{\Gamma\vdash\varphi\longrightarrow\psi}\quad\typeRule{AssmI}{}{\Gamma,\varphi\vdash\varphi}\end{equation*}&\begin{equation*}\typeRule{MP}{\Gamma\vdash\varphi\longrightarrow\psi\quad\Gamma\vdash\varphi}{\Gamma\vdash\psi}\end{equation*}\\
+        \begin{equation*}\typeRule{$\wedge{}I_1$}{\Gamma\vdash\varphi}{\Gamma\vdash\varphi\wedge\psi}\quad\cdots\end{equation*}&\begin{equation*}\typeRule{VE}{\Gamma\vdash\varphi\wedge\psi\quad\Gamma,\varphi\vdash\omega\quad\Gamma,\psi\vdash\omega}{\Gamma\vdash\omega}\end{equation*}\\
+    \end{tabularx}\label{tab:table5}
+\end{table}
+\subsection{Typsysteme}
+Funktionstypen rechtsassoziativ
+%\begin{equation*}
+%    \typeRule{Abs}{
+%    ... \vdash ...
+%    }{
+%    \vdash \abs{x}{\abs{y}{\liin{y}{\lii{x}{y}}}} : ((\alpha \to \beta) \to \alpha) \to (\alpha \to \beta) \to \beta
+%    }
+%\end{equation*}
 %
 % BibTeX Literaturverzeichnis
 %

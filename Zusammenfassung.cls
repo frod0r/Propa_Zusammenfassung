@@ -62,6 +62,7 @@
 \noindent
 \@Seminartitel
 \newline
+\@Semester
 
 \vspace{3cm}
 
