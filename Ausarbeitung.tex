@@ -39,6 +39,7 @@
 
 \newcommand{\abs}[2]{\lambda{}#1.#2}
 %% Ende der dreist kopierten Kommandos
+\newcommand{\mylet}[3]{let\ #1=#2\ in\ #3}
 
 %Seminar definieren
 \Seminartitel{Programmierparadigmen}
@@ -338,6 +339,22 @@ Typisierung von \textlambda{}-Term $t$: Paar $(\Gamma,\tau)$, sodass $\Gamma\vda
     \end{tabularx}
     \label{tab:3}
 \end{table}
+\subsection{Typinferenz}
+    $ta(\tau,\Gamma)$ bindet alle in $\Gamma$ freien Typvariablen mit einem $\forall$ in $\tau$\\
+    Bsp.: $ta(\alpha\rightarrow\beta,x:\beta,y:\delta)=\forall\alpha.\alpha\rightarrow\beta$
+    \begin{equation*}
+        \typeRule{Let}{\Gamma\vdash{}y:\pi\quad\Gamma'\vdash{}b:\beta}{\Gamma\vdash\mylet{x}{y}{b:\tau}}
+    \end{equation*}
+    Constraints: Finde Unifikator $\sigma_\textsc{let}$ und allg. Typ $\pi$ für $y$
+    \begin{enumerate}
+        \item Sei $C_0$ die bisherige Constraintmenge inklusive $\{\tau=\beta\}$
+        \item Sammle Constraints aus linken Teilbaum in $C_\textsc{let}$
+        \item Berechne \textit{mgu} $\sigma_\textsc{let}$ von $C_\textsc{let}$
+        \item Berechne $\Gamma':=\sigma_\textsc{let}(\Gamma),x:ta(\sigma_\textsc{let}(\pi),\sigma_\textsc{let}(\Gamma))$
+        \item Benutze $\Gamma'$ in rechten Teilbaum, sammle Constraints in $C_1$
+        \item Ergebnisscontraints sind $C_0\cup{}C'_\textsc{let}\cup{}C_1$\\
+        mit $C'_\textsc{let} := \{\alpha_i = \sigma_\textsc{let}(\alpha_i)|\sigma_\textsc{let}$ definiert für $\alpha_i\}$
+    \end{enumerate}
 %\begin{equation*}
 %    \typeRule{Abs}{
 %    ... \vdash ...
