@@ -143,7 +143,7 @@ List Comprehensions \haskellinline{[e | q1, ..., qm]}, $q_i$ Tests oder Generato
 \textcolor{darkgray}{Beispiel: \texttt{squares n = [x * x | x <- [0..n]]}}\\
 Im Muster \texttt{p} gebundene Variablen können in \texttt{e} und in \texttt{qi} verwendet werden\\
 %! suppress = RedundantEscape
-\textcolor{darkgray}{Beispiel: \texttt{evens n = [x | $\underbrace{\texttt{x<-[0..n]}}_\text{Generator}$, $\underbrace{\texttt{x \textasciigrave mod \textasciigrave 2 == 0]}}_\text{Tester}$}}
+\textcolor{darkgray}{Beispiel: \texttt{evens n = [x | $\underbrace{\texttt{x<-[0..n]}}_\text{Generator}$, $\underbrace{\texttt{x \textasciigrave mod \textasciigrave 2 == 0]}}_\text{Tester}$}}\\
 \textbf{Unendliche Listen}: \haskellinline{odds = 1 : map (+2) odds}
 %! suppress = LineBreak
 \begin{minted}[escapeinside=||]{haskell}
