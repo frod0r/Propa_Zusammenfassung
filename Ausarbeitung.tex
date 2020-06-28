@@ -15,6 +15,9 @@
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 \usepackage{tikz}
 \usepackage{amssymb}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{ wasysym}
 \usetikzlibrary{positioning, calc, arrows, fit, decorations.pathreplacing, shapes, shapes.multipart, snakes}
 %Folgende Definitionen sind aus dem TUT Copy-Pasted
 \newcommand{\typeRule}[3]{ \textrm{\textsc{#1}}\frac{#2}{#3}}
@@ -66,15 +69,27 @@
 \textbf{Linear Rekursiv}: In jeden Definitionszweig kommt nur ein rekursiver Aufruf vor.\\
 \textbf{Endrekursiv}: Linear rekursiv in jeden Zweig ist  der rekursive Aufruf nicht in andere Aufrufe eingebettet.\\
 \subsection{Listen}\label{subsec:listen}
-\haskellinline{[]}, \haskellinline{x:xs}, \haskellinline{head[1,2,3] => 1},
-\haskellinline{tail[1,2,3] => [2,3]}, \haskellinline{init xs -- Alle elemente bis auf das letzte},
-\haskellinline{null[1,2,3] => False},
-\haskellinline{length},\haskellinline{isIn}, \haskellinline{a ++ b},
-\haskellinline{take n l -- erste n Elemente von l},
-\haskellinline{drop n l  -- l ohne erste n Elemente},
-\haskellinline{xs !! n -- Nte Listenelement},
-%TODO: In einzellne Zellen ziehen?
+\haskellinline{[]},\haskellinline{x:xs}
+\begin{wrapfigure}{l}{0.125\textwidth}
+\includegraphics[height=2\baselineskip]{./listmonster.png}
+\end{wrapfigure}
+\haskellinline{head[1,2,3] => 1}, \haskellinline{tail[1,2,3] => [2,3]}\\
+\haskellinline{init [1,2,3] => [1,2]}, \haskellinline{last [1,2,3] => 3}\\
+\haskellinline{take n l -- erste n Elemente von l}\\
+\haskellinline{drop n l  -- l ohne erste n Elemente}\\
+
+\noindent
+\haskellinline{takewhile bedingung liste}\\
+\haskellinline{dropwhile bedingung liste}\\
+\haskellinline{span b l == (takewhile b l, dropwhile b l)}\\
+
+\noindent
+\haskellinline{null[1,2,3] => False}\\
+\haskellinline{length}\\
+\haskellinline{isIn}
 \begin{minted}{haskell}
+a ++ b
+xs !! n -- Nte Listenelement
 reverse xs
 map f (x:xs) -- wendet f auf alle Listenelemente an
 filter pred (x:xs) -- behalte alle Elemente, die Prädikat erfüllen
@@ -196,7 +211,7 @@ data shape = Circle Double
 \end{minted}
 Automatische Instanziierung auch für \haskellinline{Show},\haskellinline{Ord},\haskellinline{Enum}
 \subsection{Monaden}\label{subsec:monaden}
-%TODO?
+\newpage
 \section{λ-Kalkül}\label{sec:lambda-kalkul}
 \subsection{untypisiertes λ-Kalkül}\label{subsec:untypisiertes-lambda-kalkul}
 \begin{table}[H]
@@ -258,11 +273,13 @@ Eine (natürliche) Zahl drückt aus, wie oft die funktion $s$ angewendet wurde\\
     $isZero = \lambda n.n\ (\lambda x.c_{false})\ c_{true}$
     \end{tabularx}
 \end{table}
+\noindent
     Rekursionsoperator
-    $y =\lambda f.(\lambda x.f\ (x\ x))(\lambda x.f\ (x\ x))$\\
-    $f\ (y\ f)\stackrel{\eta}{=}y\ f$\\
-    $y\ f$ ist Fixpunkt von $f$\\
+    $Y =\lambda f.(\lambda x.f\ (x\ x))(\lambda x.f\ (x\ x))$\\
+    $f\ (Y\ f)\stackrel{\eta}{=}Y\ f$\\
+    $Y\ f$ ist Fixpunkt von $f$\\
 
+\noindent
     Church-Rosser: Wenn $t \Rightarrow t_1$ und $t_1 \stackrel{*}{\Rightarrow} t_2$, dann gibt es $t'$ mit $t_1 \stackrel{*}{\Rightarrow}t'$ und $t_2 \stackrel{*}{\Rightarrow}t'$
     \begin{table}[H]
         \centering
@@ -311,6 +328,7 @@ Regelsysteme alternative Notation
         \begin{equation*}\typeRule{$\wedge{}I_1$}{\Gamma\vdash\varphi}{\Gamma\vdash\varphi\wedge\psi}\quad\cdots\end{equation*}&\begin{equation*}\typeRule{VE}{\Gamma\vdash\varphi\wedge\psi\quad\Gamma,\varphi\vdash\omega\quad\Gamma,\psi\vdash\omega}{\Gamma\vdash\omega}\end{equation*}\\
     \end{tabularx}\label{tab:table5}
 \end{table}
+\newpage
 \subsection{Typsysteme}
 Funktionstypen rechtsassoziativ
 Typsystem $\Gamma\vdash t:\tau$ im Typkontext $\Gamma$ hat Term $t$ Typ $\tau$. $\Gamma$ ordnet freien Variablen $x$ ihren Typ $\Gamma(x)$ zu.
@@ -339,7 +357,16 @@ Typisierung von \textlambda{}-Term $t$: Paar $(\Gamma,\tau)$, sodass $\Gamma\vda
     \end{tabularx}
     \label{tab:3}
 \end{table}
-\subsection{Typinferenz}
+\newpage
+\subsection{Typinferenz}\label{subsec:typinferenz}
+    \begin{table}[H]
+        \centering
+        \begin{tabularx}{\textwidth}{X|X}
+            \begin{equation*}\begin{aligned}\typeRule{Var}{\Gamma(x)=\sigma\quad\sigma\succeq\iota}{\Gamma\vdash{}x:\tau} \\ \text{Constraint: }\{\iota=\tau\}\end{aligned}\end{equation*}&\begin{equation*}\begin{aligned}\typeRule{App}{\Gamma\vdash{}f:\xi\quad\Gamma\vdash{}x:\varphi}{\Gamma\vdash{}f\ x:\alpha}\\ \text{Constraint: }\{\xi=\varphi\rightarrow\alpha\}\end{aligned}\end{equation*}\\
+            \hline
+            \begin{equation*}\begin{aligned}\typeRule{Abs}{\Gamma,p:\pi\vdash{}b:\beta}{\Gamma\vdash\lambda{}p.b:\alpha\rightarrow\alpha}\\ \text{Constraint: }\{\alpha=\pi\rightarrow\beta\}\end{aligned}\end{equation*}&\begin{equation*}\begin{aligned}\typeRule{Let}{\Gamma\vdash{}y:\pi\quad\Gamma'\vdash{}b:\beta}{\Gamma\vdash\mylet{x}{y}{b:\tau}}\\ \text{Constraints: Siehe unten}\end{aligned}\end{equation*}\\
+        \end{tabularx}\label{tab:table7}
+    \end{table}
     $ta(\tau,\Gamma)$ bindet alle in $\Gamma$ freien Typvariablen mit einem $\forall$ in $\tau$\\
     Bsp.: $ta(\alpha\rightarrow\beta,x:\beta,y:\delta)=\forall\alpha.\alpha\rightarrow\beta$
     \begin{equation*}
@@ -355,6 +382,18 @@ Typisierung von \textlambda{}-Term $t$: Paar $(\Gamma,\tau)$, sodass $\Gamma\vda
         \item Ergebnisscontraints sind $C_0\cup{}C'_\textsc{let}\cup{}C_1$\\
         mit $C'_\textsc{let} := \{\alpha_i = \sigma_\textsc{let}(\alpha_i)|\sigma_\textsc{let}$ definiert für $\alpha_i\}$
     \end{enumerate}
+    \textcolor{darkgray}{
+    Typen sind Rechstassoziativ also wenn suche nach mgu und
+    \begin{equation*}
+        \begin{aligned}
+            \alpha_1&=\alpha_3\rightarrow\alpha_4\rightarrow\alpha_5  = (\alpha_3\rightarrow(\alpha_4\rightarrow\alpha_5))\\
+            \alpha_2&=\alpha_6\rightarrow\alpha_7\\
+            \text{dann}\\
+           \alpha_6&\text{ \pointer\ }\alpha_3\\
+            \alpha_7&\text{ \pointer\ }\alpha_4\rightarrow\alpha_5
+        \end{aligned}
+    \end{equation*}
+    }
 %\begin{equation*}
 %    \typeRule{Abs}{
 %    ... \vdash ...
