@@ -364,7 +364,7 @@ Typisierung von \textlambda{}-Term $t$: Paar $(\Gamma,\tau)$, sodass $\Gamma\vda
         \begin{tabularx}{\textwidth}{X|X}
             \begin{equation*}\begin{aligned}\typeRule{Var}{\Gamma(x)=\sigma\quad\sigma\succeq\iota}{\Gamma\vdash{}x:\tau} \\ \text{Constraint: }\{\iota=\tau\}\end{aligned}\end{equation*}&\begin{equation*}\begin{aligned}\typeRule{App}{\Gamma\vdash{}f:\xi\quad\Gamma\vdash{}x:\varphi}{\Gamma\vdash{}f\ x:\alpha}\\ \text{Constraint: }\{\xi=\varphi\rightarrow\alpha\}\end{aligned}\end{equation*}\\
             \hline
-            \begin{equation*}\begin{aligned}\typeRule{Abs}{\Gamma,p:\pi\vdash{}b:\beta}{\Gamma\vdash\lambda{}p.b:\alpha\rightarrow\alpha}\\ \text{Constraint: }\{\alpha=\pi\rightarrow\beta\}\end{aligned}\end{equation*}&\begin{equation*}\begin{aligned}\typeRule{Let}{\Gamma\vdash{}y:\pi\quad\Gamma'\vdash{}b:\beta}{\Gamma\vdash\mylet{x}{y}{b:\tau}}\\ \text{Constraints: Siehe unten}\end{aligned}\end{equation*}\\
+            \begin{equation*}\begin{aligned}\typeRule{Abs}{\Gamma,p:\pi\vdash{}b:\beta}{\Gamma\vdash\lambda{}p.b:\alpha}\\ \text{Constraint: }\{\alpha=\pi\rightarrow\beta\}\end{aligned}\end{equation*}&\begin{equation*}\begin{aligned}\typeRule{Let}{\Gamma\vdash{}y:\pi\quad\Gamma'\vdash{}b:\beta}{\Gamma\vdash\mylet{x}{y}{b:\tau}}\\ \text{Constraints: Siehe unten}\end{aligned}\end{equation*}\\
         \end{tabularx}\label{tab:table7}
     \end{table}
     $ta(\tau,\Gamma)$ bindet alle in $\Gamma$ freien Typvariablen mit einem $\forall$ in $\tau$\\
