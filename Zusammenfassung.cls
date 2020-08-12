@@ -64,12 +64,12 @@
 \newline
 \@Semester
 
-\vspace{3cm}
+\vspace{2cm}
 
 \noindent
 {\Large\textbf{\@Arbeitstitel}}
 
-\vspace{3cm}
+\vspace{2cm}
 
 \noindent
 \begin{tabular}{ll}
@@ -77,8 +77,6 @@ Autor:	      & \@Autor\\
 \end{tabular}
 
 %Inhaltsverzeichnis
-\clearpage
-\thispagestyle{empty}
 \tableofcontents
 \clearpage
 
